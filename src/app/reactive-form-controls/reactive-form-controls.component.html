@@ -1,0 +1,239 @@
+<div class="container">
+  <section class="py-5">
+    <form [formGroup]="empForm" (ngSubmit)="onSubmit()">
+      <div class="d-flex my-2 flex-row justify-content-between flex-wrap">
+        <h2>{{ editMode ? "Edit" : "Add" }} Employee</h2>
+        <div>
+          <button
+            type="submit"
+            class="btn btn-success btn-sm mr-2"
+            [disabled]="submitClick || loader"
+          >
+            <i class="fas fa-save" *ngIf="!submitClick"></i>
+            <span
+              class="spinner-border spinner-border-sm"
+              *ngIf="submitClick"
+            ></span>
+    
+            Save
+          </button>
+          <a class="btn btn-danger btn-sm" [routerLink]="['/crud']">
+            <i class="fas fa-step-backward"></i> Cancel
+          </a>
+        </div>
+      </div>
+    
+      <div class="row" *ngIf="!loader">
+        <div class="col-md-12">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="fname"
+                >First Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                name="fname"
+                class="form-control"
+                id="fname"
+                formControlName="fname"
+                placeholder="Enter your first name"
+              />
+              <div
+                class="inp-err"
+                *ngIf="f.fname.invalid && isSubmit && f.fname.errors['required']"
+              >
+                Required.
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="lname"
+                >Last Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                name="lname"
+                class="form-control"
+                id="lname"
+                placeholder="Enter your last name"
+                formControlName="lname"
+              />
+              <div
+                class="inp-err"
+                *ngIf="f.lname.invalid && isSubmit && f.lname.errors['required']"
+              >
+                Required
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="email">Email <span class="text-danger">*</span></label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="Email address"
+                formControlName="email"
+              />
+              <div
+                class="inp-err"
+                *ngIf="f.email.invalid && isSubmit && f.email.errors['required']"
+              >
+                Required
+              </div>
+              <div
+                class="inp-err"
+                *ngIf="f.email.invalid && isSubmit && f.email.errors['email']"
+              >
+                Enter valid email id
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="mobile">Mobile <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="mobile"
+                placeholder="Mobile number"
+                formControlName="mobile"
+              />
+              <div
+                class="inp-err"
+                *ngIf="f.mobile.invalid && isSubmit && f.mobile.errors['required']"
+              >
+                Required
+              </div>
+            </div>
+          </div>
+
+          
+            <div formArrayName="hobbies">
+              <div *ngFor="let hobby of hobbiesArray.controls; let i=index" [formGroupName]="i" >
+                <label>
+                  <input type="checkbox" formControlName="selected" />
+                  {{hobby.get('name').value}}
+                </label>
+              </div>
+            </div>
+           
+
+          <p  *ngIf="atLeastOne()">
+            Checkbox is required, select atleast one value.
+          </p>
+        
+    
+    
+          <div formArrayName="addressDetails">
+            <div
+              *ngFor="let group of addressArray.controls; let i = index"
+              [formGroupName]="i"
+              class="dymicRow"
+            >
+              <div class="d-flex flex-wrap flex-row justify-content-between">
+                <h2>Address {{ i + 1 }}</h2>
+                <div>
+                  <button
+                    type="button"
+                    (click)="addAddress()"
+                    class="btn btn-primary btn-sm"
+                    [ngClass]="{ 'mr-2': i !== 0 }"
+                  >
+                    <i class="fas fa-plus"></i>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="removeAddress(i)"
+                    class="btn btn-danger btn-sm"
+                    *ngIf="addressArray.controls.length > 1 && i !== 0"
+                  >
+                    <i class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+    
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label for="address{{ i }}"
+                    >Steert Address <span class="text-danger">*</span></label
+                  >
+                  <textarea
+                    type="text"
+                    name="address"
+                    class="form-control"
+                    id="address{{ i }}"
+                    formControlName="address"
+                    placeholder="Street Address"
+                  ></textarea>
+                  <div
+                    class="inp-err"
+                    *ngIf="
+                      group.get('address').invalid &&
+                      isSubmit &&
+                      group.get('address').errors['required']
+                    "
+                  >
+                    Required.
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="city{{ i }}"
+                    >City <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    name="city"
+                    class="form-control"
+                    id="city{{ i }}"
+                    formControlName="city"
+                    placeholder="City"
+                  />
+                  <div
+                    class="inp-err"
+                    *ngIf="
+                    group.get('city').invalid &&
+                      isSubmit &&
+                      group.get('city').errors['required']
+                    "
+                  >
+                    Required.
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="state{{ i }}"
+                    >State<span class="text-danger">*</span></label
+                  >
+                  <select
+                    name="state{{ i }}"
+                    class="form-control"
+                    id="state"
+                    placeholder="Select state"
+                    formControlName="state"
+                  >
+                    <option selected [ngValue]="null">Select your state</option>
+                    <option *ngFor="let item of states" [value]="item">
+                      {{ item }}
+                    </option>
+                  </select>
+                  <div
+                    class="inp-err invalid"
+                    *ngIf="
+                    group.get('state').invalid &&
+                      isSubmit &&
+                      group.get('state').errors['required']
+                    "
+                  >
+                    Required
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="spinner-border text-info" *ngIf="loader"></div>
+    </form>
+  </section>
+
+
+</div>
